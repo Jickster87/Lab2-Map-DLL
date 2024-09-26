@@ -51,51 +51,50 @@ TValue Map::add(TKey c, TValue v){
 }
 
 TValue Map::remove(TKey c){
-	//empty list
-    if (headOfList == nullptr) {
-        return NULL_TVALUE;
-    }
+    NodeStruct * nomadNode = headOfList;
     //search and move nomad to elem
-    NodeStruct * nomadNode = headOfList; // <<<------------------------------------------------||
-    //                                                                                         ||
-    while (nomadNode != nullptr && nomadNode->dataPair.first != c) { //                        ||
-        nomadNode = nomadNode->nextAddress;//                                                  ||
-    }//  <<<-------- at the end of this loop nomdaNode is set to the pair we are looking for --||
-    //element not found                                                                        ||
-    if (headOfList == nullptr) { //                                                            ||
-        return  NULL_TVALUE; //                                                                ||
-    } //                                                                                       ||
-    //                                                                                         ||
+    while (nomadNode != nullptr && nomadNode->dataPair.first != c) {
+        nomadNode = nomadNode->nextAddress;//
+    }
+    //if not found
+    if (nomadNode == nullptr) {
+          return NULL_TVALUE;
+      }
     
-    //TValue oldValue = nomadNode->dataPair.second; //  <<<-----------save the old value --------||
+    //to be deleted node, bookmark this address node ?
+    //NodeStruct * todeleteNode = nomadNode;
+    TValue oldValue = nomadNode->dataPair.second;
     
-    //element found - case1: first element of the list
-    //case1: subcases
-    if (nomadNode->prevAddress == nullptr) {
-        headOfList = headOfList->nextAddress; //skip head (set head to [head+1] address)
-        //entering subcase checks (more elements present - tail is not null , one element present - tail needs to be null also)
-        if (headOfList != nullptr) {
-            //c1-subcase a. List contains more than head element >1 elem (tail is some other elem x)
-            headOfList->prevAddress = nullptr;
-        } else {
-            //c1-subcase b. That was the only one element in the list (head = tail = removeable node)
-            tailOfList = nullptr;
+    if (nomadNode != nullptr) {
+        if (nomadNode == headOfList) {
+            headOfList = headOfList->nextAddress;
+            if (headOfList != nullptr) {
+                headOfList->prevAddress = nullptr;
+            }
         }
-    //element found - case2: element is the last element in the list
-    //case2:
-    } else if (nomadNode == tailOfList) {
-    //element is the tail of the list
-        tailOfList = tailOfList->prevAddress;
-        tailOfList->nextAddress = nullptr;
-    } else {
-    //element is in between - case3
-    //case3:
-        nomadNode->nextAddress->prevAddress = nomadNode->prevAddress;
-        nomadNode->prevAddress->nextAddress = nomadNode->nextAddress;
+        else if (nomadNode == tailOfList) {
+            tailOfList = tailOfList->prevAddress;
+            if (tailOfList != nullptr) {
+                tailOfList->nextAddress = nullptr;
+            }
+        }
+        else {
+            //WARNING!! (can you explain please?)
+            //it works but this feels like a weird workaround from gpt !!!
+            //why do i still need to check for null ptr if I checked above, or I didnt cover ?
+            if (nomadNode->nextAddress != nullptr) {
+                   nomadNode->nextAddress->prevAddress = nomadNode->prevAddress;
+               }
+
+               if (nomadNode->prevAddress != nullptr) {
+                   nomadNode->prevAddress->nextAddress = nomadNode->nextAddress;
+               }
+        }
     }
     delete nomadNode;
+    //delete todeleteNode;
     totalElemsLL--;
-    return NULL_TVALUE;
+    return oldValue;
 }
 
 TValue Map::search(TKey c) const{

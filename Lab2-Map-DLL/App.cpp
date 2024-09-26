@@ -11,7 +11,7 @@ using namespace std;
 int main() {
 	testAll();
     cout << "Shorts ok!" << endl;
-    //testAllExtended();
+    testAllExtended();
 
 	cout << "That's all!" << endl;
 	system("pause");
